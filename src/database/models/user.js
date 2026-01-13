@@ -14,17 +14,14 @@ module.exports = (sequelize, DataTypes) => {
   }
 
     static associate(models) {
-      // define association here
+      //define associations here
+      User.hasMany(models.Account, {
+        foreignKey: 'user_id'
+      })
     }
   }
   User.init({
-    id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
-        primaryKey: true,
-        
-      },
+
       first_name: {
         type: DataTypes.STRING,
         allowNull: false
@@ -49,7 +46,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+          len: [8, 100]
+        }
       },
       pin: {
         type: DataTypes.STRING,
@@ -85,6 +85,14 @@ module.exports = (sequelize, DataTypes) => {
         if(user.changed('pin')){
           user.pin = await bcrypt.hash(user.pin, 12)
         }
+      }
+    },
+    defaultScope: {
+      attributes: exclude['password', 'pin']
+    },
+    scopes: {
+      withSecret: {
+        attributes: include['password', 'pin']
       }
     }
   });
