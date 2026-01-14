@@ -1,12 +1,13 @@
 const express = require('express')
 require('dotenv').config()
-const {notFound} = require('./middlewares/404Handler')
-const {logger, errorHandler} = require('./middlewares/errorHandler')
+const {notFound} = require('./middlewares/notFound.controller')
+const {logger, errorHandler} = require('./middlewares/error.controller')
 const app = express()
 
 
 const PORT = process.env.PORT || 2102
 
+app.use(express.json())
 
 app.use(notFound)
 app.use(errorHandler)

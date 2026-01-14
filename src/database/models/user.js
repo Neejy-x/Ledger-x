@@ -42,6 +42,9 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         validate: {
           isEmail: true
+        },
+        set(value){
+          this.setDataValue('email', value.toLowerCase())
         }
       },
       password: {
