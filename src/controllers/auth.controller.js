@@ -14,7 +14,7 @@ const user = await User.create({
     last_name,
     email,
     password,
-    
+    pin
 })
 
 }

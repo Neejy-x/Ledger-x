@@ -7,7 +7,8 @@ async function executeTransaction({
     sourceAccountId,
     destinationAccountId,
     amount,
-    idempotencyKey,transactionPin
+    idempotencyKey,
+    transactionPin
 }){
 
     const redisKey = `idempotency:${idempotencyKey}`

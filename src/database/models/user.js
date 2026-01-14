@@ -39,6 +39,11 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Account, {
         foreignKey: 'user_id'
       })
+
+      User.hasMany(models.Refresh_token, {
+        foreignKey: 'user_id',
+        as: 'refreshTokens'
+      })
     }
   }
   User.init({
