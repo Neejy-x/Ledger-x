@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'account_id'
       })
 
-      Ledger_entry(models.Transaction,{
+      Ledger_entry.belongsTo(models.Transaction,{
         foreignKey: 'transaction_id'
       })
     }

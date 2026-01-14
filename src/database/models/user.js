@@ -88,11 +88,11 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     defaultScope: {
-      attributes: exclude['password', 'pin']
+      attributes: {exclude: ['password', 'pin']}
     },
     scopes: {
       withSecret: {
-        attributes: include['password', 'pin']
+        attributes: {include:['password', 'pin']}
       }
     }
   });

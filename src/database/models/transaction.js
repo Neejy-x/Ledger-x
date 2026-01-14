@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       status: {
-        type: DataTypes.ENUM('pending', 'committed', 'reversed'),
+        type: DataTypes.ENUM('pending', 'in_progress', 'committed', 'reversed'),
         allowNull:false
       },
       idempotency_key: {
@@ -49,6 +49,42 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Transaction',
+    hooks: {
+      afterCreate: async(transaction, options)=>{
+        if(!options.audit) return
+        const {Audit_log} = transaction.sequelize.models
+
+        await Audit_log.create({
+          actorId: options.audit.userId,
+          action: 'TRANSACTION_CREATED',
+          metadata: {
+            transactionId: transaction.id,
+            status: transaction.status,
+            amount: transaction.amount,
+            sourceAccount: transaction.source_account_id,
+            destinationAccountId: transaction.destination_account_id
+          }
+        }, {
+          transaction: options.transaction
+        })
+      },
+      afterUpdate: async(transaction, options)=> {
+        if(!options.audit) return
+        if(transaction.changed('status')){
+          const {Audit_log} = transaction.sequelize.models
+          await Audit_log.create({
+            actorId: options.audit.userId,
+            action: 'TRANSACTION_STATUS_CHANGED',
+            metadata: {
+              transactionId: transaction.id,
+              newStatus: transaction.status
+            }
+          }, {
+            transaction: options.transaction
+          })
+        }
+      }
+    }
   });
   return Transaction;
 };
