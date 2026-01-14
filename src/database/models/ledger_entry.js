@@ -23,19 +23,11 @@ module.exports = (sequelize, DataTypes) => {
   Ledger_entry.init({
      account_id: {
         type: DataTypes.UUID,
-        allowNull: false,
-        references: {
-          model: 'Accounts',
-          key: 'id'
-        }
+        allowNull: false
       },
       transaction_id: {
         type: DataTypes.UUID,
-        allowNull: false,
-        references: {
-          model: 'Transactions',
-          key: 'id'
-        }
+        allowNull: false
       },
       delta: {
         type: DataTypes.DECIMAL(18,2),
