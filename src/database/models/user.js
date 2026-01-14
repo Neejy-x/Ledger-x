@@ -10,7 +10,28 @@ module.exports = (sequelize, DataTypes) => {
   }
 
   async validatePin(pin){
-    return await bcrypt.compare(pin, this.pin)
+    // check if account is active
+    if(this.status === 'suspended'){
+      throw new Error('Account suspended due to too many failed PIN attempts')
+    }
+
+    //validate pin
+    const isValid =  await bcrypt.compare(pin, this.pin)
+    if(!isValid){
+      this.transaction_pin_attempts += 1
+
+      if(this.transaction_pin_attempts >= 3){
+        this.status = 'suspended'
+      }
+
+      await this.save({fields: ['transaction_pin_attempts', 'status']})
+
+      return false
+    }
+
+    this.transaction_pin_attempts = 0
+    await this.save({fields: ['transaction_pin_attempts']})
+    return true
   }
 
     static associate(models) {
@@ -57,6 +78,11 @@ module.exports = (sequelize, DataTypes) => {
       pin: {
         type: DataTypes.STRING,
         allowNull: false
+      },
+      transaction_pin_attempts: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        defaultValue: 0
       },
       role: {
         type: DataTypes.ENUM('user', 'admin'),

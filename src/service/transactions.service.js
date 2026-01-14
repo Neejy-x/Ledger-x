@@ -7,7 +7,7 @@ async function executeTransaction({
     sourceAccountId,
     destinationAccountId,
     amount,
-    idempotencyKey
+    idempotencyKey,transactionPin
 }){
 
     const redisKey = `idempotency:${idempotencyKey}`
@@ -48,7 +48,13 @@ async function executeTransaction({
     if(sourceAccount.status !== 'active') throw new Error('Please reach out to customer care rep for help')
     
     if(destinationAccount.status !== 'active') throw new Error('invalid destination account')
-    
+
+    //validate source account transaction pin
+    const user = await sourceAccount.getUser({transaction: transferTransaction})
+    const validPin = user.validatePin(transactionPin)
+    if(!validPin) throw new Error('invalid pin entered')
+
+
     //validate source account balance
     if(Number(sourceAccount.balance) < Number(amount)) throw new Error('Insufficient balance')
 
