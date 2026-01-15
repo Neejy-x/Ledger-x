@@ -61,3 +61,27 @@ export const logoutHandler = async (req, res) => {
         message: 'Logout successful'
     })
 }
+
+export const refreshHandler = async (req, res) => {
+const cookies = req.cookies
+if(!cookies?.jwt) return res.sendStatus(401)
+
+const refreshToken = cookies.jwt 
+const{ accessToken, newRefreshToken, user} = await AuthService.refresh(refreshToken)
+
+res.cookie('jwt', newRefreshToken,{
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000
+})
+
+res.status(200).json({
+    status: 'Successful',
+    user: 
+    {
+        name: user.full_name,
+        email: user.email
+    },
+    accessToken
+})
+}
