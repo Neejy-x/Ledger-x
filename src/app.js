@@ -1,8 +1,9 @@
 const express = require('express')
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
-const {notFound} = require('./middlewares/notFound.controller')
-const {logger, errorHandler} = require('./middlewares/error.controller')
+const authRouter = require('./routes/auth.routes')
+const {notFound} = require('./middlewares/notFound.middleware')
+const {logger, errorHandler} = require('./middlewares/error.middleware')
 const app = express()
 
 
@@ -10,7 +11,7 @@ const PORT = process.env.PORT || 2102
 
 app.use(express.json())
 app.use(cookieParser())
-
+app.use('/api/auth', authRouter)
 app.use(notFound)
 app.use(errorHandler)
 

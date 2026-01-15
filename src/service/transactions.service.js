@@ -1,5 +1,5 @@
 const {Account, User, Transaction, Ledger_entry, sequelize} = require('../database/models')
-const {logger} = require('../middlewares/error.controller')
+const {logger} = require('../middlewares/error.middleware')
 const client = require('../redis/client')
 
 const IDEMPOTENCY_TTL = 24 * 60 * 60
