@@ -39,6 +39,37 @@ static  async signup (payload){
   }
 };
 
+
+
+
+static async login(payload){
+    try{
+    const user = await User.findOne({where: {email: payload.email}})
+    if(!user){
+        const e = new Error('Invalid email or password')
+        e.statusCode = 409
+        throw e
+    }
+    const isValid = await user.validatePassword(payload.password)
+    if(!isValid){
+        const e = new Error('Invalid email or password')
+        e.statusCode = 401
+        throw e;
+    } 
+
+    const accessToken = jwt.sign({id: user.id, role: user.role}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
+
+    const refreshToken = jwt.sign({id: user.id, role: user.role}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '7d'})
+
+    await user.createRefreshToken({token: refreshToken})
+
+    return{user, accessToken, refreshToken}
+
+    }catch(e){
+    throw e;
+    }
+
+}
 }
 
 module.exports = AuthService
