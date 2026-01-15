@@ -20,7 +20,7 @@ export const createAccountHandler = async (req, res) => {
     })
 }
 
-export const getAccounts = async (req, res) => {
+export const getAccountsHandler = async (req, res) => {
     const {id} = req.user
     const {accounts, user} = await AccountService.getAccounts(id)
     res.status(200).json({
@@ -40,13 +40,11 @@ export const getAccounts = async (req, res) => {
     })
 }
 
-export const getAccountById = async(req, res) => {
+export const getAccountByIdHandler = async(req, res) => {
     const {accountId} = req.params
-    const {userId} = req.user
+    const {id} = req.user
 
-
-
-    const {account, user } = await AccountService.getAccountById({userId, accountId})
+    const {account, user } = await AccountService.getAccountById({id, accountId})
     res.status(200).json({
         status: 'Successful',
         user: {
@@ -59,5 +57,23 @@ export const getAccountById = async(req, res) => {
             currency: account.currency,
             status: account.status
         }
+    })
+}
+
+export const closeAccountHandler = async(req, res) => {
+    const {accountId} = req.params
+    const {id} = req.user
+
+    const {account, user } = await AccountService.closeAccount({id, accountId})
+    res.status(200).json({
+    status: 'Successful',
+    user: {
+        name: user.full_name,
+        email: user.email
+    },
+    closed_account: {
+    accountId: account.id,
+    status: account.status
+    }
     })
 }

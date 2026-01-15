@@ -6,7 +6,7 @@ class AccountService {
    */
   static async createAccount(payload) {
     try {
-      const user = await User.findByPk(payload.userId);
+      const user = await User.findByPk(payload.id);
 
       if (!user) {
         const e = new Error("Invalid user");
@@ -30,8 +30,8 @@ class AccountService {
     }
   }
 
-  static async getAccounts(userId) {
-    const user = await User.findByPk(userId, {
+  static async getAccounts(id) {
+    const user = await User.findByPk(id, {
       include: {
         model: Account,
         attributes: { include: ["balance", "currency", "status"] },
@@ -46,18 +46,18 @@ class AccountService {
   }
 
   static async getAccountById(payload) {
-    const user = await User.findByPk(payload.userId);
+    const user = await User.findByPk(payload.id);
     if (!user) {
       const e = new Error("Invalid User");
       e.statusCode = 401;
       throw e;
     }
 
-    const account = await Account.findByPk(payload.accountId, {
-      where: { id: payload.accountId, user_id: payload.userId },
+    const account = await Account.findOne(payload.accountId, {
+      where: { id: payload.accountId, user_id: payload.id },
       attributes: ["balance", "currency", "status"],
     });
-    
+
     if (!account) {
       const e = new Error("Account not found");
       e.statusCode = 404;
@@ -66,6 +66,61 @@ class AccountService {
 
     return { account, user };
   }
+
+ static async closeAccount({ id, accountId }) {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const user = await User.findByPk(id, { transaction });
+    if (!user) {
+      const e = new Error('Invalid User');
+      e.statusCode = 401;
+      throw e;
+    }
+
+    const account = await Account.findOne({
+      where: {
+        id: accountId,
+        user_id: id
+      },
+      transaction,
+      lock: transaction.LOCK.UPDATE
+    });
+
+    if (!account) {
+      const e = new Error('Account not found');
+      e.statusCode = 404;
+      throw e;
+    }
+
+    if (account.status === 'closed') {
+      const e = new Error('Account already closed');
+      e.statusCode = 400;
+      throw e;
+    }
+
+    if (Number(account.balance) !== 0) {
+      const e = new Error('Account balance must be zero to close account');
+      e.statusCode = 400;
+      throw e;
+    }
+
+    await account.update(
+      { status: 'closed' },
+      { transaction }
+    );
+
+    await transaction.commit();
+    return { account, user };
+
+  } catch (e) {
+    if (!transaction.finished) {
+      await transaction.rollback();
+    }
+    throw e;
+  }
+}
+
 }
 
 module.exports = AccountService;
