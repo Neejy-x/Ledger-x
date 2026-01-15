@@ -1,16 +1,20 @@
-const {Account} = require('../database/models')
+const {Account, User} = require('../database/models')
 const client = require('../redis/client')
 
 const BALANCE_CHECK_TTL = 60 * 60
 
-const checkBalance = async(accountId)=> {
-    const redisKey = `account:balance:${accountId}`
+const checkBalance = async({accountId, id})=> {
+    const redisKey = `account:balance:${id}:${accountId}`
 try{
 
-const cachedBalance = client.get(redisKey)
+const cachedBalance = await client.get(redisKey)
 if(cachedBalance) return JSON.parse(cachedBalance)
 
-const account = await Account.findByPk(accountId)
+const account = await Account.findOne(accountId, {
+    where:
+     {  id: accountId,
+        user_id: user.id
+    }})
 if(!account) throw new Error('Account does not exist')
 
 const result = {

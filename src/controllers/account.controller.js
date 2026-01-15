@@ -77,3 +77,4 @@ export const closeAccountHandler = async(req, res) => {
     }
     })
 }
+
