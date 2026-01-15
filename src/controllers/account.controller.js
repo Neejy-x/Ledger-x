@@ -32,7 +32,8 @@ export const getAccounts = async (req, res) => {
         accounts: accounts.map(acc => ({
             id: acc.id,
             balance: acc.balance,
-            currency: acc.currency
+            currency: acc.currency,
+            status: acc.status
         })
 
         )
@@ -43,10 +44,20 @@ export const getAccountById = async(req, res) => {
     const {accountId} = req.params
     const {userId} = req.user
 
-    const payload = {
-        userId,
-        accountId
-    }
 
-    const {account, user } = await AccountService.getAccountById(payload)
+
+    const {account, user } = await AccountService.getAccountById({userId, accountId})
+    res.status(200).json({
+        status: 'Successful',
+        user: {
+            name: user.full_name,
+            email: user.email
+        },
+        account: {
+            id: account.id,
+            balance: account.balance,
+            currency: account.currency,
+            status: account.status
+        }
+    })
 }
