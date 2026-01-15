@@ -122,7 +122,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     defaultScope: {
-      attributes: {exclude: ['password', 'pin']}
+      attributes: {exclude: ['password', 'pin', 'transaction_pin_attempts']}
     },
     scopes: {
       withSecret: {

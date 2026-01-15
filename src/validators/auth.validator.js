@@ -8,9 +8,9 @@ export const signupSchema = z.object({
     pin:  z.string()
     .length(4, "Transaction PIN must be exactly 4 digits")
     .regex(/^\d+$/, "PIN must contain only numbers")
-})
+}).strip()
 
 export const loginSchema = z.object({
     email: z.string().trim().email(),
     password: z.string()
-})
+}).strip()

@@ -1,20 +1,24 @@
-const {User} = require('../database/models')
-const jwt = require('jsonwebtoken')
+const AuthService = require("../service/auth.service");
 
 export const signupHandler = async (req, res) => {
+  const payload = req.body;
+  //fetch user and tokens from auth service
+  const { user, refreshToken, accessToken } = await AuthService.signup(payload);
 
-const { first_name, last_name, email, password } = req.body
+  //assign refresh token to cookies
+  res.cookie("jwt", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
-const userExists = await User.findOne({where: {email}})
-
-if(userExists) return res.status(409).json({message: 'User already exists'})
-
-const user = await User.create({
-    first_name,
-    last_name,
-    email,
-    password,
-    pin
-})
-
-}
+  res.status(201).json({
+    status: "Success",
+    user: {
+      id: user.id,
+      name: user.full_name,
+      email: user.email,
+    },
+    accessToken,
+  });
+};
