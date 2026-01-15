@@ -55,6 +55,8 @@ async function executeTransaction({
     const validPin = user.validatePin(transactionPin)
     if(!validPin) throw new Error('invalid pin entered')
 
+    //validate account currencies
+    if(sourceAccount.currency !== destinationAccount.currency) throw new Error(`Invalid transaction type: can only transfer to ${sourceAccount.currency} account`)
 
     //validate source account balance
     if(Number(sourceAccount.balance) < Number(amount)) throw new Error('Insufficient balance')
