@@ -38,3 +38,15 @@ export const getAccounts = async (req, res) => {
         )
     })
 }
+
+export const getAccountById = async(req, res) => {
+    const {accountId} = req.params
+    const {userId} = req.user
+
+    const payload = {
+        userId,
+        accountId
+    }
+
+    const {account, user } = await AccountService.getAccountById(payload)
+}

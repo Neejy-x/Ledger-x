@@ -40,6 +40,45 @@ class AccountService {
             e.statusCode = 401
             throw e
         }
+
+         if(user.status === 'suspended'){
+            const e = new Error('Please talk to an admin to create account')
+            e.statusCode = 403
+            throw e
+        }
         return {accounts: user.Accounts, user}
     }
+
+
+    static async getAccountById(payload){
+    const user = await User.findByPk(payload.userId)
+    if(!user ){
+        const e = new Error('Invalid User')
+        e.statusCode = 401
+        throw e
+    }
+
+     if(user.status === 'suspended'){
+            const e = new Error('Please talk to an admin to create account')
+            e.statusCode = 403
+            throw e
+        }
+
+    const account = await Account.finByPk(payload.accountId, {include: ['balance', 'currency', 'status']})
+    if(!account){
+        const e = new Error('Account not found')
+        e.statusCode = 404
+        throw e
+    }
+
+    if(account.user_id !== payload.userId){
+        const e = new Error('Unauthorized')
+        e.statusCode = 403
+        throw e
+    }
+
+    return {account, user}
+    }
 }
+
+module.exports = AccountService
