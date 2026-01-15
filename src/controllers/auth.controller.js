@@ -44,3 +44,20 @@ export const loginHandler = async(req, res) => {
         accessToken
     })
 }
+
+export const logoutHandler = async (req, res) => {
+    const cookies = req.cookies
+    if(!cookies?.jwt){
+        res.sendStatus(204)
+    }
+    const refreshToken = cookies.jwt
+    await AuthService.logout(refreshToken)
+    res.clearCookie('jwt', {
+        httpOnly: true, 
+        secure: process.env.NODE_ENV == 'production'
+    })
+
+    res.status(200).json({
+        message: 'Logout successful'
+    })
+}

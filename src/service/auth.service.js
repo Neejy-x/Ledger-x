@@ -1,4 +1,4 @@
-const { User, sequelize } = require("../database/models");
+const { User, Refresh_token, sequelize } = require("../database/models");
 
 class AuthService{
 
@@ -70,6 +70,34 @@ static async login(payload){
     }
 
 }
+
+static async logout(refreshToken){
+    
+    try{
+
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
+
+    const user = await User.findByPk(decoded.id, {include: {model: Refresh_token, as: 'refreshTokens'}})
+
+    if(!user){
+        const e = new Error('Invalid user')
+        e.statusCode = 401
+        throw e;
+    }
+
+    const token = await user.refreshTokens.find(t => t.validateToken(refreshToken))
+    if(token) await token.destroy()
+    return true
+    }catch(e){
+        if(e.name === 'JsonWebTokenError' || e.name === 'TokenExpiredError') {
+            const e = new Error('Invalid Token')
+            e.statusCode = 403
+            throw e
+        }
+    throw e
+    }
+}
+
 }
 
 module.exports = AuthService
