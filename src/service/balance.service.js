@@ -1,5 +1,5 @@
 const {Account, User} = require('../database/models')
-const client = require('../redis/client')
+const client = require('../config/redisClient.config')
 
 const BALANCE_CHECK_TTL = 60 * 60
 
@@ -10,10 +10,10 @@ try{
 const cachedBalance = await client.get(redisKey)
 if(cachedBalance) return JSON.parse(cachedBalance)
 
-const account = await Account.findOne(accountId, {
+const account = await Account.findOne({
     where:
      {  id: accountId,
-        user_id: user.id
+        user_id: id
     }})
 if(!account) throw new Error('Account does not exist')
 
