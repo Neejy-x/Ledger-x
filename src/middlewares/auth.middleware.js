@@ -11,8 +11,10 @@ exports.authHandler = (req, res, next)=> {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
     req.user = {
         id: decoded.id,
-        role: decoded.role
+        role: decoded.role,
+        status: decoded.status
     }
+    if(decoded.status === 'suspended') return res.status(401).json({message: 'Account suspended, talk to an admin'})
     next()
    }catch(e){
     if(e.name === 'JsonWebTokenError' || e.name === 'TokenExpiredError'){

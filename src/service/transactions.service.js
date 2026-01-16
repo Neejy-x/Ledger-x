@@ -3,13 +3,13 @@ const {logger} = require('../middlewares/error.middleware')
 const client = require('../redis/client')
 
 const IDEMPOTENCY_TTL = 24 * 60 * 60
-async function executeTransaction({
+exports.executeTransaction = async ({
     sourceAccountId,
     destinationAccountId,
     amount,
     idempotencyKey,
     transactionPin
-}){
+})=> {
 
     const redisKey = `idempotency:${idempotencyKey}`
     const existing = await client.get(redisKey)
@@ -139,4 +139,8 @@ async function executeTransaction({
     }
 }
 
-module.exports = executeTransaction
+exports.getTransactions = async (id)=>{
+
+    return await Transaction.findAll({where: {user_id: }})
+
+}

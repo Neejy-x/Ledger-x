@@ -35,10 +35,10 @@ static  async signup (payload){
     const user = await User.create(payload, { transaction });
 
     //generate tokens
-    const accessToken = jwt.sign({id: user.id, role: user.role}, process.env.ACCESS_TOKEN_SECRET, {
+    const accessToken = jwt.sign({id: user.id, role: user.role, status: user.status}, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "15m",
     });
-    const refreshToken = jwt.sign({id: user.id, role: user.role}, process.env.REFRESH_TOKEN_SECRET, {
+    const refreshToken = jwt.sign({id: user.id, role: user.role, status: user.status}, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: "7d",
     });
 
@@ -75,9 +75,9 @@ static async login(payload){
         throw e;
     } 
 
-    const accessToken = jwt.sign({id: user.id, role: user.role}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
+    const accessToken = jwt.sign({id: user.id, role: user.role, status: user.status}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
 
-    const refreshToken = jwt.sign({id: user.id, role: user.role}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '7d'})
+    const refreshToken = jwt.sign({id: user.id, role: user.role, status: user.status}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '7d'})
 
     await Refresh_token.destroy({where: {user_id: user.id}})
     await user.createRefreshToken({token: refreshToken})
@@ -146,9 +146,9 @@ static async refresh(refreshToken){
     //enforce token rotation
     await token.destroy()
     //generate new tokens
-    const newRefreshToken = jwt.sign({id: user.id, role: user.role}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '7d'})
+    const newRefreshToken = jwt.sign({id: user.id, role: user.role, status: user.status}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '7d'})
     await user.createRefreshToken({token: newRefreshToken})
-    const accessToken = jwt.sign({id: user.id, role: user.role}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
+    const accessToken = jwt.sign({id: user.id, role: user.role, status: user.status}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '15m'})
 
     return {user, accessToken, newRefreshToken}
     }catch(e){

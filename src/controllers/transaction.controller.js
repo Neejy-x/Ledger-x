@@ -1,4 +1,4 @@
-const executeTransaction = require('../service/transactions.service')
+const {executeTransaction} = require('../service/transactions.service')
 
 exports.transactionHandler = async (req, res) => {
     const payload = req.body
@@ -7,4 +7,9 @@ exports.transactionHandler = async (req, res) => {
         status: 'Successful',
         response
     })
+}
+
+exports.getTransactions = async (req, res) => {
+    const { id } = req.user
+
 }
