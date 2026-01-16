@@ -1,4 +1,4 @@
-import { createClient } from 'redis';
+const { createClient } = require ('redis')
 
 const client = createClient({
     username: 'default',
@@ -9,9 +9,8 @@ const client = createClient({
     }
 });
 
-client.on('error', err => console.log('Redis Client Error', err));
+client.on('error', err => console.error('Redis Client Error:', err));
+client.on('connect', () => console.log('Redis Client Connected'));
 
-await client.connect();
-
-Model.exports = client;
+module.exports = client;
 

@@ -1,6 +1,6 @@
 const AuthService = require("../service/auth.service");
 
-export const signupHandler = async (req, res) => {
+exports.signupHandler = async (req, res) => {
   const payload = req.body;
   //fetch user and tokens from auth service
   const { user, refreshToken, accessToken } = await AuthService.signup(payload);
@@ -23,7 +23,7 @@ export const signupHandler = async (req, res) => {
   });
 };
 
-export const loginHandler = async(req, res) => {
+exports.loginHandler = async(req, res) => {
     const payload = req.body
 
     const { user, refreshToken, accessToken} = await AuthService.login(payload)
@@ -45,7 +45,7 @@ export const loginHandler = async(req, res) => {
     })
 }
 
-export const logoutHandler = async (req, res) => {
+exports.logoutHandler = async (req, res) => {
     const cookies = req.cookies
     if(!cookies?.jwt){
         res.sendStatus(204)
@@ -62,7 +62,7 @@ export const logoutHandler = async (req, res) => {
     })
 }
 
-export const refreshHandler = async (req, res) => {
+exports.refreshHandler = async (req, res) => {
 const cookies = req.cookies
 if(!cookies?.jwt) return res.sendStatus(401)
 

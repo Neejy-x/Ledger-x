@@ -2,7 +2,7 @@
 const jwt = require('jsonwebtoken')
 
 
-export const authHandler = (req, res, next)=> {
+exports.authHandler = (req, res, next)=> {
    try{
     const authHeader = req.headers.authorization || req.headers.authorization
     if(!authHeader?.startsWith('Bearer ')) return res.status(401).json({message: 'Unauthorized: no token provided'})
@@ -25,7 +25,7 @@ export const authHandler = (req, res, next)=> {
 
 }
 
-export const isAdmin = (req, res, next) => {
+exports.isAdmin = (req, res, next) => {
     const { role } = req.user
     if(role !== 'admin'){
         return res.status(401).json({message: `Unauthorized: ${role} not allowed`})

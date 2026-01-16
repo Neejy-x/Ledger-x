@@ -1,6 +1,6 @@
 const AccountService = require('../service/account.service')
 
-export const createAccountHandler = async (req, res) => {
+exports.createAccountHandler = async (req, res) => {
     const { id } = req.user
     const {currency} = req.body
 
@@ -20,7 +20,7 @@ export const createAccountHandler = async (req, res) => {
     })
 }
 
-export const getAccountsHandler = async (req, res) => {
+exports.getAccountsHandler = async (req, res) => {
     const {id} = req.user
     const {accounts, user} = await AccountService.getAccounts(id)
     res.status(200).json({
@@ -40,7 +40,7 @@ export const getAccountsHandler = async (req, res) => {
     })
 }
 
-export const getAccountByIdHandler = async(req, res) => {
+exports.getAccountByIdHandler = async(req, res) => {
     const {accountId} = req.params
     const {id} = req.user
 
@@ -60,7 +60,7 @@ export const getAccountByIdHandler = async(req, res) => {
     })
 }
 
-export const closeAccountHandler = async(req, res) => {
+exports.closeAccountHandler = async(req, res) => {
     const {accountId} = req.params
     const {id} = req.user
 

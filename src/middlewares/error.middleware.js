@@ -4,7 +4,7 @@ const {timestamp, json, prettyPrint, errors, simple, combine} = winston.format
 
 const logger = winston.createLogger({
     level: 'info',
-    format: combine(timestamp(), json(), errors({stack: true})),
+    format: combine(timestamp(), json(), errors({stack: true}), prettyPrint()),
     transports: [
         new winston.transports.File({filename: 'src/logs/app.log'}),
         new winston.transports.Console({format: simple()})

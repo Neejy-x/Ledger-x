@@ -13,6 +13,6 @@ const authRouter = express.Router();
 authRouter.post("/signup", validate(signupSchema), signupHandler);
 authRouter.post("/login", validate(loginSchema), loginHandler);
 authRouter.post("/logout", authHandler, logoutHandler);
-authRouter.post("/refresh", refreshHandler, getAcc);
+authRouter.post("/refresh", refreshHandler);
 
 module.exports = authRouter;

@@ -1,6 +1,6 @@
 const checkBalance = require('../service/balance.service')
 
-export const getBalanceHandler = async (req, res) => {
+exports.getBalanceHandler = async (req, res) => {
     const{id} = req.user
     const {accountId} = req.params
     const balance = await checkBalance({accountId, id})

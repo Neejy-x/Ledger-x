@@ -1,4 +1,8 @@
+const { config } = require("dotenv");
 const { User, Refresh_token, sequelize } = require("../database/models");
+const jwt = require('jsonwebtoken')
+
+
 
 class AuthService{
 
@@ -14,6 +18,9 @@ class AuthService{
  */
 
 static  async signup (payload){
+  console.log({
+        ACCESS: process.env.ACCESS_TOKEN_SECRET,
+        REFRESH: process.env.REFRESH_TOKEN_SECRET})
   const transaction = await sequelize.transaction();
   try {
     //verify user does not exist
@@ -55,10 +62,10 @@ static  async signup (payload){
 
 static async login(payload){
     try{
-    const user = await User.findOne({where: {email: payload.email}})
+    const user = await User.scope('withSecret').findOne({where: {email: payload.email}})
     if(!user){
         const e = new Error('Invalid email or password')
-        e.statusCode = 409
+        e.statusCode = 401
         throw e
     }
     const isValid = await user.validatePassword(payload.password)
@@ -72,6 +79,7 @@ static async login(payload){
 
     const refreshToken = jwt.sign({id: user.id, role: user.role}, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '7d'})
 
+    await Refresh_token.destroy({where: {user_id: user.id}})
     await user.createRefreshToken({token: refreshToken})
 
     return{user, accessToken, refreshToken}
@@ -111,6 +119,7 @@ static async logout(refreshToken){
 
 
 static async refresh(refreshToken){
+     
     try{
     //decode token
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET)
@@ -124,6 +133,7 @@ static async refresh(refreshToken){
         throw e
     }
 
+ 
     //find token
     const token = user.refreshTokens.find(t => t.validate(refreshToken))
     //clear tokens and force logout
@@ -142,7 +152,7 @@ static async refresh(refreshToken){
 
     return {user, accessToken, newRefreshToken}
     }catch(e){
-     if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+     if (e.name === 'JsonWebTokenError' || e.name === 'TokenExpiredError') {
         const e = new Error('Invalid or expired refresh token')
         e.statusCode = 403
         throw e

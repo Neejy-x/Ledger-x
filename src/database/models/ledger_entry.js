@@ -21,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Ledger_entry.init({
+     id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
+      },
      account_id: {
         type: DataTypes.UUID,
         allowNull: false
