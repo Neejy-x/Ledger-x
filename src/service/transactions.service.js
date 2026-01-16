@@ -33,6 +33,11 @@ async function executeTransaction({
     const transferTransaction = await sequelize.transaction()
 
     try{
+     //validate source account transaction pin
+    const user = await sourceAccount.getUser({transaction: transferTransaction})
+    const validPin = user.validatePin(transactionPin)
+    if(!validPin) throw new Error('invalid pin entered')
+
     
     //find and lock destination and source accounts
       const [sourceAccount, destinationAccount] = await Account.findAll({
@@ -45,15 +50,14 @@ async function executeTransaction({
     //validate both source and destination accounts
     if(!sourceAccount || !destinationAccount) throw new Error('Account not found!')
     
+    if (sourceAccountId === destinationAccountId) {
+    throw new Error('Cannot transfer to same account')
+    }
+
     //validate both source and destination account statuses
     if(sourceAccount.status !== 'active') throw new Error('Please reach out to customer care rep for help')
     
     if(destinationAccount.status !== 'active') throw new Error('invalid destination account')
-
-    //validate source account transaction pin
-    const user = await sourceAccount.getUser({transaction: transferTransaction})
-    const validPin = user.validatePin(transactionPin)
-    if(!validPin) throw new Error('invalid pin entered')
 
     //validate account currencies
     if(sourceAccount.currency !== destinationAccount.currency) throw new Error(`Invalid transaction type: can only transfer to ${sourceAccount.currency} account`)
@@ -120,11 +124,17 @@ async function executeTransaction({
     //invalidate cached balances for both accounts
     await client.del(`account:balance:${sourceAccountId}`)
     await client.del(`account:balance:${destinationAccountId}`)
+    return {result, amount: transactionRecord.amount, from: sourceAccount.full_name, to: destinationAccount.full_name}
     }catch(e){
     if(transferTransaction && !transferTransaction.finished){
     await transferTransaction.rollback()
     }
-    await client.del(redisKey)
+    await client.set(
+    redisKey,
+    JSON.stringify({ status: 'failed', error: e.message }),
+    'EX',
+    IDEMPOTENCY_TTL
+    )
     throw e;
     }
 }
