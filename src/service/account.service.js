@@ -20,7 +20,7 @@ class AccountService {
       }
       const account = await user.createAccount({
         balance: 0,
-        currency: payload.currency ?? "ngn",
+        currency: payload.currency,
         status: "active",
       });
 
@@ -53,7 +53,7 @@ class AccountService {
       throw e;
     }
 
-    const account = await Account.findOne(payload.accountId, {
+    const account = await Account.findOne( {
       where: { id: payload.accountId, user_id: payload.id },
       attributes: ["balance", "currency", "status"],
     });

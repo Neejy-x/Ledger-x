@@ -4,8 +4,7 @@ exports.createAccountHandler = async (req, res) => {
     const { id } = req.user
     const {currency} = req.body
 
-    const payload  = {id}
-    if(currency) payload.currency = currency
+    const payload  = {id, currency}
     
 
     const {account, user} = await AccountService.createAccount(payload)
@@ -47,7 +46,7 @@ exports.getAccountByIdHandler = async(req, res) => {
     const {account, user } = await AccountService.getAccountById({id, accountId})
     res.status(200).json({
         status: 'Successful',
-        user: {
+        Owner: {
             name: user.full_name,
             email: user.email
         },
