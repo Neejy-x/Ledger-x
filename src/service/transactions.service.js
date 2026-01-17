@@ -1,3 +1,4 @@
+const { tr } = require('zod/locales')
 const {Account, User, Transaction, Ledger_entry, sequelize} = require('../database/models')
 const {logger} = require('../middlewares/error.middleware')
 const client = require('../redis/client')
@@ -141,6 +142,27 @@ exports.executeTransaction = async ({
 
 exports.getTransactions = async (id)=>{
 
-    return await Transaction.findAll({where: {user_id: }})
+    const accounts = await Account.findAll({where: {user_id: id}, attributes: ['id']})
+    const accountIds = accounts.map(ac => ac.id)
+  
+    return await Transaction.findAll({
+        where: {
+             [Op.or] : [
+            {sourceAccountId: accountIds},
+            {destinationAccountId: accountIds}
+        ]
+    }
+    })
 
+}
+
+
+exports.getTransactionById = async (transactionId) => {
+    const transaction = await Transaction.findByPk(transactionId)
+    if(!transaction){
+        const e = new Error('Transaction not found')
+        e.statusCode = 404
+        throw e
+    }
+    return transaction
 }

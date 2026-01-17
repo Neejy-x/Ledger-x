@@ -34,8 +34,8 @@ class AccountService {
     const user = await User.findByPk(id, {
       include: {
         model: Account,
-        attributes: { include: ["balance", "currency", "status"] },
-      },
+        attributes: { include: ["balance", "currency", "status"] }
+      }
     });
     if (!user) {
       const e = new Error("Invalid User");
