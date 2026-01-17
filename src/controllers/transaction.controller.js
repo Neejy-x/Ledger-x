@@ -9,7 +9,7 @@ exports.transactionHandler = async (req, res) => {
     })
 }
 
-exports.getTransactions = async (req, res) => {
+exports.getTransactionsHandler = async (req, res) => {
     const { id } = req.user
 
     const transactions = await getTransactions(id)
