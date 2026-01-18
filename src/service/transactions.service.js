@@ -1,7 +1,7 @@
 const { tr } = require('zod/locales')
 const {Account, User, Transaction, Ledger_entry, sequelize} = require('../database/models')
 const {logger} = require('../middlewares/error.middleware')
-const client = require('../redis/client')
+const client = require('../config/redisClient.config')
 
 const IDEMPOTENCY_TTL = 24 * 60 * 60
 exports.executeTransaction = async ({

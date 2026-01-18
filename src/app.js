@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 2102
 app.use(express.json())
 app.use(cookieParser())
 app.use('/api/auth', authRouter)
-app.use('/health', healthRouter)
+app.use('/admin/health', healthRouter)
 app.use('/api/accounts', accountRouter)
 app.use('/transactions', transactionsRouter)
 app.use(notFound)
