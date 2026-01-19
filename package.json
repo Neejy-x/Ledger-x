@@ -1,7 +1,7 @@
 {
   "name": "ledgerx",
   "version": "1.0.0",
-  "type":"commonjs",
+  "type": "commonjs",
   "main": "app.js",
   "scripts": {
     "dev": "nodemon src/app.js"
@@ -16,8 +16,10 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "limit": "^0.0.1",
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
+    "rate": "^0.1.1",
     "redis": "^5.10.0",
     "sequelize": "^6.37.7",
     "winston": "^3.19.0",

@@ -46,12 +46,7 @@ exports.executeTransaction = async ({
   const transferTransaction = await sequelize.transaction();
 
   try {
-    //validate source account transaction pin
-    const user = await sourceAccount.getUser({
-      transaction: transferTransaction,
-    });
-    const validPin = user.validatePin(transactionPin);
-    if (!validPin) throw new Error("invalid pin entered");
+   
 
     //find and lock destination and source accounts
     const [sourceAccount, destinationAccount] = await Account.findAll({
@@ -60,6 +55,12 @@ exports.executeTransaction = async ({
       transaction: transferTransaction,
       lock: transferTransaction.LOCK.UPDATE,
     });
+     //validate source account transaction pin
+    const user = await sourceAccount.getUser({
+      transaction: transferTransaction,
+    });
+    const validPin = user.validatePin(transactionPin);
+    if (!validPin) throw new Error("invalid pin entered");
 
     //validate both source and destination accounts
     if (!sourceAccount || !destinationAccount)
@@ -192,11 +193,17 @@ exports.getTransactions = async (payload) => {
   const { limit, page, id } = payload;
   const offset = (page - 1) * limit;
 
-  const accounts = await Account.findAll({
-    where: { user_id: id },
+  const user = await User.findByPk(id)
+  if(!user){
+    const e = new Error('User not found')
+    e.statusCode = 404
+    throw e
+  }
+
+  const accounts = await user.getAccounts({
     attributes: ["id"],
   });
-  if (accounts === 0) {
+  if (!accounts || accounts.length === 0) {
     return { rows: [], count: 0 };
   }
 
@@ -205,8 +212,8 @@ exports.getTransactions = async (payload) => {
   const { rows, count } = await Transaction.findAndCountAll({
     where: {
       [Op.or]: [
-        { sourceAccountId: { [Op.in]: accountIds } },
-        { destinationAccountId: { [Op.in]: accountIds } },
+        { source_account_id: { [Op.in]: accountIds } },
+        { destination_account_id: { [Op.in]: accountIds } },
       ],
     },
     limit,

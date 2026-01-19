@@ -18,9 +18,7 @@ class AuthService{
  */
 
 static  async signup (payload){
-  console.log({
-        ACCESS: process.env.ACCESS_TOKEN_SECRET,
-        REFRESH: process.env.REFRESH_TOKEN_SECRET})
+  
   const transaction = await sequelize.transaction();
   try {
     //verify user does not exist

@@ -7,3 +7,8 @@ exports.userRoleSchema = z.object({
 exports.userStatusSchema = z.object({
     status: z.enum(['active', 'suspended'])
 })
+
+
+exports.accountStatusSchema = z.object({
+    status: z.enum(['active', 'frozen'])
+})

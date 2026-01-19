@@ -1,5 +1,4 @@
 const { User, Account, Audit_log} = require("../database/models");
-const a = require("../database/models/audit_log");
 
 exports.getUsers = async ({ limit, page }) => {
   const offset = (page - 1) * limit;
@@ -36,7 +35,7 @@ exports.updateUserRole = async ({ userId, role }) => {
 };
 
 exports.updateUserStatus = async ({ userId, status }) => {
-  const user = user.findByPk(userId);
+  const user = await User.findByPk(userId);
   if (!user) {
     const e = new Error("user not found");
     e.statusCode = 404;
@@ -96,4 +95,18 @@ exports.getLogs = async ({page, limit}) => {
     })
 
     return {rows, count}
+}
+
+
+exports.updateAccountStatus = async ({accountId, status}) => {
+    const account = await Account.findByPk(accountId)
+    if(!account){
+        const e = new Error('Account not found')
+        e.statusCode = 404
+        throw e
+    }
+
+    account.status = status
+    await account.save()
+    return account
 }

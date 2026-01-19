@@ -5,6 +5,7 @@ const {
   updateUserStatus,
   getUserById,
   getLogs,
+  updateAccountStatus,
 } = require("../service/admin.service");
 
 exports.getUsersHandler = async (req, res) => {
@@ -28,7 +29,7 @@ exports.getUserByIdHandler = async (req, res) => {
 
   const user = await getUserById(userId);
 
-  res.status(200).toJSON({
+  res.status(200).json({
     status: "Successful",
     user,
   });
@@ -65,8 +66,8 @@ exports.updateUserStatusHandler = async (req, res) => {
 };
 
 exports.getAccountsHandler = async (req, res) => {
-    const page = req.query.page || 1
-    const limit = req.query.limit || 10
+    const page = parseInt(req.query.page )|| 1
+    const limit = parseInt(req.query.limit)|| 10
     const {rows, count} = await getAccounts({page,limit})
 
     res.status(200).json({
@@ -87,8 +88,8 @@ exports.getAccountsHandler = async (req, res) => {
 
 
 exports.getLogsHandler =  async (req, res) => {
-    const page = req.query.page || 1
-    const limit = req.query.limit || 10
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 10
 
     const {rows, count} = await getLogs({page, limit})
 
@@ -100,6 +101,22 @@ exports.getLogsHandler =  async (req, res) => {
             totalPages: Math.ceil(count / limit),
             page,
             limit
+        }
+    })
+}
+
+exports.updateAccountStatusHandler = async (req, res) => {
+    const {status} = req.body
+    const {accountId} = req.params
+
+    const account = await updateAccountStatus({accountId, status})
+
+    res.status(200).json({
+        status: 'Successful',
+        account: {
+            id: account.id,
+            status: account.status,
+            balance: account.balance
         }
     })
 }
