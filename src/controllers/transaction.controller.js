@@ -41,7 +41,7 @@ exports.getTransactionsHandler = async (req, res) => {
 exports.getTransactionByIdHandler = async (req, res) => {
   const { transactionId } = req.params;
   const transaction = await getTransactionById(transactionId);
-  res.send(200).json({
+  res.status(200).json({
     status: "Successful",
     transaction: {
         id: transaction.id,
