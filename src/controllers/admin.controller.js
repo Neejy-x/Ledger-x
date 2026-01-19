@@ -1,7 +1,8 @@
 const { 
     updateUserRole, 
     getUsers,
-    updateUserStatus
+    updateUserStatus,
+    getUserById
  } = require("../service/admin.service")
 
 
@@ -10,6 +11,17 @@ exports.getUsersHandler = async (req, res) => {
     res.status(200).json({
         status: 'Successful',
         users
+    })
+}
+
+exports.getUserByIdHandler = async (req, res) => {
+    const {userId} = req.params
+
+    const user = await getUserById(userId)
+
+    res.status(200).toJSON({
+        status: 'Successful',
+        user
     })
 }
 

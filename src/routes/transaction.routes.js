@@ -5,8 +5,12 @@ const transactionSchema = require('../validators/transaction.validator')
 const { transactionHandler, getTransactionsHandler, getTransactionByIdHandler } = require('../controllers/transaction.controller')
 const transactionRouter = express.Router()
 
-transactionRouter.post('/', authHandler, validate(transactionSchema), transactionHandler)
-transactionRouter.get('/', authHandler, getTransactionsHandler)
-transactionRouter.get('/:transactionId', authHandler, getTransactionByIdHandler)
+transactionRouter.use(authHandler)
+
+
+transactionRouter.get('/', getTransactionsHandler)
+transactionRouter.get('/:transactionId', getTransactionByIdHandler)
+
+transactionRouter.post('/', validate(transactionSchema), transactionHandler)
 
 module.exports = transactionRouter

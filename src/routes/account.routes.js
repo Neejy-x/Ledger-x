@@ -7,10 +7,16 @@ const { getBalanceHandler } = require('../controllers/balance.controller')
 
 const accountRouter = express.Router()
 
-accountRouter.post('/', authHandler, validate(createAccountSchema), createAccountHandler)
-accountRouter.get('/', authHandler, getAccountsHandler)
-accountRouter.get('/:accountId', authHandler, getAccountByIdHandler)
-accountRouter.post('/:accountId/close', authHandler, closeAccountHandler)
-accountRouter.get('/:accountId/balance', authHandler, getBalanceHandler)
+accountRouter.use(authHandler)
+
+accountRouter.get('/', getAccountsHandler)
+accountRouter.get('/:accountId', getAccountByIdHandler)
+accountRouter.get('/:accountId/balance', getBalanceHandler) //cached balance
+
+
+
+accountRouter.post('/', validate(createAccountSchema), createAccountHandler)
+
+accountRouter.patch('/:accountId/close', closeAccountHandler)
 
 module.exports = accountRouter

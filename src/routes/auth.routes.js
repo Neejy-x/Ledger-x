@@ -10,6 +10,7 @@ const validate = require("../middlewares/validator.middleware");
 const { signupSchema, loginSchema } = require("../validators/auth.validator");
 const authRouter = express.Router();
 
+
 authRouter.post("/signup", validate(signupSchema), signupHandler);
 authRouter.post("/login", validate(loginSchema), loginHandler);
 authRouter.post("/logout", authHandler, logoutHandler);

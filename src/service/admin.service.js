@@ -7,8 +7,7 @@ exports.getUsers = async () => {
     attributes: [
         "id",
         "first_name",
-        "last_name", 
-        "full_name", 
+        "last_name",
         "email"
     ],
     include: [
@@ -16,8 +15,7 @@ exports.getUsers = async () => {
         model: Account,
         attributes: ["id", "balance"],
       },
-    ],
-    group: ['User.id', 'accounts.id']
+    ]
   });
 
   return users.map( u => ({
@@ -55,7 +53,7 @@ exports.updateUserStatus = async ({ userId, status }) => {
 exports.getUserById = async(userId) => {
     const user = await User.findOne({
         where: {id: userId},
-        attributes: ['id', 'email', 'first_name', 'last_name', 'full_name'],
+        attributes: ['id', 'email', 'first_name', 'last_name'],
         include: [
             {
                 model: Account,
@@ -74,5 +72,6 @@ exports.getUserById = async(userId) => {
         ...user.toJSON(),
         totalAccount:user.accounts.length
     }
+    return result
 
 }
