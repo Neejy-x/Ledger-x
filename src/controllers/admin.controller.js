@@ -1,8 +1,10 @@
+const { getAccounts } = require("../service/account.service");
 const {
   updateUserRole,
   getUsers,
   updateUserStatus,
   getUserById,
+  getLogs,
 } = require("../service/admin.service");
 
 exports.getUsersHandler = async (req, res) => {
@@ -61,3 +63,43 @@ exports.updateUserStatusHandler = async (req, res) => {
     },
   });
 };
+
+exports.getAccountsHandler = async (req, res) => {
+    const page = req.query.page || 1
+    const limit = req.query.limit || 10
+    const {rows, count} = await getAccounts({page,limit})
+
+    res.status(200).json({
+        status: 'Successful',
+        accounts: rows.map( row => ({
+           id:  row.id,
+           balance: row.balance,
+           owner: row.user_id
+        })),
+        meta:{
+            totalAccounts: count,
+            page,
+            count,
+            totalPages: Math.ceil(count / limit)
+        }
+    })
+}
+
+
+exports.getLogsHandler =  async (req, res) => {
+    const page = req.query.page || 1
+    const limit = req.query.limit || 10
+
+    const {rows, count} = await getLogs({page, limit})
+
+    res.status(200).json({
+        status: 'Successful',
+        logs: rows,
+        metadata:{
+            totalLogs: count,
+            totalPages: Math.ceil(count / limit),
+            page,
+            limit
+        }
+    })
+}
