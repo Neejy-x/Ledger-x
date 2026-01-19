@@ -10,14 +10,13 @@ adminRouter.use(authHandler, isAdmin)
 
 adminRouter.get('/users', getUsersHandler)
 adminRouter.get('users/:userId', getUserByIdHandler)
+adminRouter.get('/accounts', )
+adminRouter.get('/ledger-entries', authHandler, isAdmin)
+adminRouter.get('/audit-logs', authHandler, isAdmin,  )
 
 adminRouter.patch('/users/:userId/role', validate(userRoleSchema),  updateUserRoleHandler)
 adminRouter.patch('/users/:userId/status', validate(userStatusSchema), updateUserStatusHandler )
-
-adminRouter.get('/accounts', authHandler, isAdmin, )
-adminRouter.post('accounts/:accountId/status', authHandler, isAdmin,  )
-adminRouter.get('/ledger-entries', authHandler, isAdmin)
-adminRouter.get('/audit-logs', authHandler, isAdmin,  )
+adminRouter.patch('accounts/:accountId/status', authHandler, isAdmin,  )
 
 
 module.exports = adminRouter

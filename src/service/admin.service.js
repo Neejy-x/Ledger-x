@@ -1,9 +1,11 @@
 const { User, Account } = require("../database/models");
-const {Sequelize} = require('sequelize')
 
-exports.getUsers = async () => {
-  const users = await User.findAll({
+exports.getUsers = async ({limit, page}) => {
+  const offset = (page - 1) * limit
+  const {rows, count} = await User.findAndCountAll({
     where: { role: "user" },
+    limit,
+    offset,
     attributes: [
         "id",
         "first_name",
@@ -18,10 +20,11 @@ exports.getUsers = async () => {
     ]
   });
 
-  return users.map( u => ({
-    ...u.toJSON(),
-    totalAccount: u.accounts.length
+  const users = rows.map( r => ({
+    ...r.toJSON(),
+    totalAccount: r.accounts.length || []
   }))
+  return {users, count}
 };
 
 exports.updateUserRole = async ({ userId, role }) => {
