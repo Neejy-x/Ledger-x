@@ -1,5 +1,8 @@
-const { use } = require("react")
-const { updateUserRole } = require("../service/admin.service")
+const { 
+    updateUserRole, 
+    getUsers,
+    updateUserStatus
+ } = require("../service/admin.service")
 
 
 exports.getUsersHandler = async (req, res) => {
@@ -19,9 +22,25 @@ exports.updateUserRoleHandler = async (req, res) => {
         status: 'Successful',
         user: {
             id: user.id,
-            fullName: user.fullName,
+            fullName: user.full_name,
             email: user.email,
             role: user.role
+        }
+    })
+}
+
+
+exports.updateUserStatusHandler = async (req, res) => {
+    const {userId} = req.params
+    const {status} = req.body
+    const user = await updateUserStatus({userId, status})
+    res.status(200).json({
+        status: 'Successful',
+        user: {
+            id: user.id,
+            fullName: user.full_name,
+            email: user.email,
+            status: user.status
         }
     })
 }
