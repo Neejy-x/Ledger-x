@@ -61,6 +61,7 @@
   - Transaction PIN with attempt limiting
   - Request validation using Zod schemas
   - Redis-based idempotency management
+  - Redis-based rate limiting (general + strict auth limits)
 
 ## 🛠 Tech Stack
 
@@ -68,7 +69,7 @@
 - **Framework:** Express.js 5.2.1
 - **Database:** PostgreSQL 14+
 - **ORM:** Sequelize 6.37.7
-- **Cache/Session Store:** Redis 6.x+
+- **Cache/Session Store/Rate Limiting:** Redis 6.x+ (caching, idempotency, rate limiting)
 - **Authentication:** JSON Web Tokens (JWT)
 - **Validation:** Zod 4.3.5
 - **Logging:** Winston 3.19.0
@@ -849,15 +850,15 @@ Check API health status.
 ### Data Flow
 
 1. **Authentication Flow:**
-   - User provides credentials → JWT tokens generated → Tokens stored in cookies/headers
+   - Rate limit checked (Redis) → User provides credentials → JWT tokens generated → Tokens stored in cookies/headers
 
 2. **Transaction Flow:**
-   - Request validated → Idempotency checked (Redis) → Transaction PIN verified
+   - Rate limit checked (Redis) → Request validated → Idempotency checked (Redis) → Transaction PIN verified
    - Database transaction started → Accounts locked → Balances updated
    - Ledger entries created → Transaction committed → Cache invalidated
 
 3. **Account Balance Retrieval:**
-   - Check Redis cache → If miss, query database → Cache result → Return
+   - Rate limit checked (Redis) → Check Redis cache → If miss, query database → Cache result → Return
 
 ## 🔒 Security Features
 
@@ -885,6 +886,12 @@ Check API health status.
 - **SQL injection prevention** via Sequelize ORM
 - **Audit logging** for compliance and debugging
 - **Sensitive data exclusion** in default model scopes
+
+### Rate Limiting & DDoS Protection
+- **Redis-based rate limiting** for all endpoints (100 requests per 15 minutes)
+- **Strict authentication rate limiting** (5 attempts per 15 minutes for login/signup)
+- **Distributed rate limiting** using Redis store for multi-instance deployments
+- **Standard rate limit headers** (RFC draft-7 compliant)
 
 ### Best Practices
 - Environment variables for sensitive configuration
@@ -1050,7 +1057,7 @@ Recommended test coverage:
 - [ ] Set up monitoring and alerting
 - [ ] Configure log rotation
 - [ ] Set up database backups
-- [ ] Enable rate limiting
+- [x] Rate limiting enabled (Redis-based, configurable limits)
 - [ ] Configure CORS appropriately
 - [ ] Review and update security headers
 
