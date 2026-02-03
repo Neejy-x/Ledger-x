@@ -48,7 +48,7 @@ exports.loginHandler = async(req, res) => {
 exports.logoutHandler = async (req, res) => {
     const cookies = req.cookies
     if(!cookies?.jwt){
-        res.sendStatus(204)
+        return res.sendStatus(204)
     }
     const refreshToken = cookies.jwt
     await AuthService.logout(refreshToken)
